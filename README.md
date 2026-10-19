@@ -30,7 +30,10 @@ A cross-platform mobile app for **Andiswa Business Consultation**, a creative st
 8. [How to test the requirements](#8-how-to-test-the-requirements)
 9. [Project structure](#9-project-structure)
 10. [Known limitations](#10-known-limitations)
-11. [References](#11-references)
+11. 11.You Tube (Demonistration Video)
+12. SQL ERROR
+13. Automated Test
+14. [References](#11-references)
 
 ---
 
@@ -279,7 +282,7 @@ https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
 ## 13. Automated Test
 
-The automated tests are in the website repository
+The automated tests are in the website repository.
 
 ## 14. References
 

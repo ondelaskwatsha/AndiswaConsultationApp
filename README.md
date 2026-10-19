@@ -280,8 +280,6 @@ https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
 ## 12. SQL Database Setup
 
-## 12
-
 ![](./GitHubPictures/Azure.jpg)
 
 

@@ -282,7 +282,7 @@ https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
 ## 12
 
-![](./gitPic/Azure.jpg)
+![](./GitHubPictures/Azure.jpg)
 
 
 ## 13. Automated Test

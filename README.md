@@ -280,36 +280,10 @@ https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
 ## 12. SQL Database Setup
 
-### Create a SQL database in Microsoft Azure
+## 12
 
-To create the database used by the application, follow the Azure SQL Database setup process shown in the portal below.
+![](./gitPic/Azure.jpg)
 
-1. Sign in to the Microsoft Azure portal.
-2. In the search bar, type `SQL databases` and select **SQL databases**.
-3. Click **+ Create**.
-4. Choose the correct **subscription** and **resource group**.
-5. Enter a database name such as `AndiswaConsultationDB`.
-6. Select or create a server. This includes the server name, admin login, and password.
-7. Under **Compute + storage**, choose the pricing tier and capacity that matches the project requirements.
-8. Configure **Networking** based on your environment:
-   - **Public access** enabled if the app or website needs internet access.
-   - Add firewall rules for the local development machine and hosting environment.
-9. Review the **Security** settings.
-10. Under **Additional settings**, choose the database collation and default backup settings.
-11. Select **Review + create** and then **Create**.
-
-The Azure dashboard will show the newly created database once deployment finishes.
-
-### Example Azure configuration
-
-- Database name: `AndiswaConsultationDB`
-- Server: `andiswa-server` or any preferred SQL server name
-- Backup storage redundancy: `Locally redundant`
-- Networking: `Public access` / firewall configured for required IPs
-- Security: `Not enabled` unless required by your implementation
-- Additional settings: `SQL_Latin1_General_CP1_CI_AS`
-
-This configuration matches the Azure SQL creation page shown in the project documentation and supports the app's database connection requirements.
 
 ## 13. Automated Test
 

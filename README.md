@@ -280,7 +280,7 @@ https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
 ## 12. SQL Database Setup
 
-![](./GitHubPictures/Azure.jpg)
+![](./GitHubPictures/Azure.jpeg)
 
 
 ## 13. Automated Test

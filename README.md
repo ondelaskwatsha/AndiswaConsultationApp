@@ -2,7 +2,7 @@
 
 **POE submission · Team LogicWave · Rosebank International**
 
-A cross-platform mobile app for **Andiswa Business Consultation**, a creative studio in Port Elizabeth that offers graphic design, branding and business consultation. The app lets the public browse the studio's services and portfolio and request a quote, and gives registered clients a personal portal where they can follow their quote requests and projects.
+A cross-platform mobile app for **Andiswa Business Consultation**, a creative studio in Port Elizabeth that offers graphic design, branding and business consultation. The app lets the public browse services, request quotes, and stay in touch with the studio through a mobile-first experience.
 
 ---
 
@@ -26,12 +26,12 @@ A cross-platform mobile app for **Andiswa Business Consultation**, a creative st
 4. [How the app, website and database work together](#4-how-the-app-website-and-database-work-together)
 5. [Technologies](#5-technologies)
 6. [Security design](#6-security-design)
-7. [How to run the app](#7-how-to-run-the-app)
+7. [How to run the app](#7-how-the-app)
 8. [How to test the requirements](#8-how-to-test-the-requirements)
 9. [Project structure](#9-project-structure)
 10. [Known limitations](#10-known-limitations)
 11. 11.You Tube (Demonistration Video)
-12. SQL ERROR
+12. SQL Database Setup
 13. Automated Test
 14. [References](#11-references)
 
@@ -41,9 +41,9 @@ A cross-platform mobile app for **Andiswa Business Consultation**, a creative st
 
 | Requirement | How it is implemented | Where to find it |
 |---|---|---|
-| **The user must be able to register and log in** | A **Create account** page (name, email, password, confirm password) and a **Log in** page. After registering, the user is logged in straight away and taken to their dashboard. The login is remembered when the app is closed. | App: `Pages/ClientRegisterPage`, `Pages/ClientLoginPage`<br>API: `Controllers/ClientController.cs` |
-| **The password must be encrypted** | Passwords are protected with **bcrypt hashing** (work factor 12, with a random salt per password). The password itself is never stored, only the hash. See [Security design](#6-security-design) for why hashing was chosen over reversible encryption. | API: `ClientController.HashPassword()` |
-| **Make use of single sign-on (SSO)** | **Continue with Google** on both the login and register pages. The user signs in with their existing Google account; Google confirms who they are and the app never sees their Google password. A client account is created automatically on the first Google sign-in. | App: `Controls/GoogleSignInButton.cs`<br>API: `Controllers/SsoController.cs` |
+| **The user must be able to register and log in** | A **Create account** page (name, email, password, confirm password) and a **Log in** page. After registering, the user is logged in straight away and receives access to their dashboard. | App pages for Account, Login and Register |
+| **The password must be encrypted** | Passwords are protected with **bcrypt hashing** (work factor 12, with a random salt per password). The password itself is never stored, only the hash. | API security section |
+| **Make use of single sign-on (SSO)** | **Continue with Google** on both the login and register pages. The user signs in with their existing Google account; Google confirms who they are and the app receives a secure sign-in result. | Google SSO integration |
 
 ---
 
@@ -67,7 +67,7 @@ A **bottom navigation bar** is shown on every main page, the same on Android and
 |---|---|
 | **Log in** | Email and password, or Continue with Google |
 | **Create account** | Registration with password rules shown on the form |
-| **Dashboard** | *Welcome, [name]*, the client's **quote requests** with their status (for example *New* or *Accepted*), and their **projects** once a quote is accepted. Pull down to refresh. Log out at the top. |
+| **Dashboard** | *Welcome, [name]*, the client's **quote requests** with their status (for example *New* or *Accepted*), and their **projects** once a quote is accepted. Pull down to refresh. Login tokens are retained securely. |
 
 ### Offline support
 The app keeps a saved copy of the studio information, so pages still load without internet. A quote request sent while offline is stored on the device and sent automatically when the connection returns.
@@ -76,7 +76,7 @@ The app keeps a saved copy of the studio information, so pages still load withou
 
 ## 3. System design
 
-The app uses a **three-tier architecture**. The app never connects to the database directly; every request goes through our own Web API. The API uses the **same database as the company website**, so quotes sent from the app appear on the website's admin page, and clients use one account for both.
+The app uses a **three-tier architecture**. The app never connects to the database directly; every request goes through our own Web API. The API uses the **same database as the company website**, which keeps the system consistent and secure.
 
 ```
  ┌──────────────────────┐        ┌──────────────────────┐        ┌──────────────────┐
@@ -85,9 +85,9 @@ The app uses a **three-tier architecture**. The app never connects to the databa
  │  (Android, Windows)  │ ◀───── │  Web API             │ ◀───── │  (shared with    │
  │                      │  JSON  │                      │        │   the website)   │
  └──────────────────────┘        └──────────┬───────────┘        └──────────────────┘
-                                            │ OAuth 2.0
-                                            ▼
-                                     Google (SSO only)
+                                             │ OAuth 2.0
+                                             ▼
+                                      Google (SSO only)
 ```
 
 **Why an API instead of connecting the app to the database?**
@@ -112,7 +112,7 @@ The app uses a **three-tier architecture**. The app never connects to the databa
 
 ## 4. How the app, website and database work together
 
-The mobile app, the company website and the database are **one connected system**. The app and the website both read from and write to the **same MySQL database**, so a change made in one place shows up in the other.
+The mobile app, the company website and the database are **one connected system**. The app and the website both read from and write to the **same MySQL database**, so a change made in one place shows in the other.
 
 ```
    Mobile app  ──▶  Web API  ──▶  ┌─────────────────┐  ◀──  Website (PHP)
@@ -125,11 +125,11 @@ The mobile app, the company website and the database are **one connected system*
 
 | Someone does this… | …it is saved in | …and it shows up here |
 |---|---|---|
-| Sends a quote request from the app's **Contact** page (or taps *Request this service* on Services or Portfolio) | `quotes` table, status **New** | The website's **admin page**, marked *"(Sent from the mobile app)"* |
-| The admin changes a quote's status on the website, for example to **Accepted** | `quotes` table | The client's **app dashboard** under *Your quote requests*, and the website's client portal |
+| Sends a quote request from the app's **Contact** page | `quotes` table, status **New** | The website's **admin page**, marked *(Sent from the mobile app)* |
+| The admin changes a quote's status on the website | `quotes` table | The client's **app dashboard** under *Your quote requests* |
 | The admin creates a project for an accepted quote | `projects` table | The client's **app dashboard** under *Your projects* |
-| The admin changes the studio details on the website (phone, email, address, hours, statistics) | `settings` table | The app's **Home** and **Contact** pages and footer |
-| A client creates an account in the app (email and password, or Google) | `clients` table | The client can also log in to the **website's client portal** with the same account |
+| The admin changes the studio details on the website | `settings` table | The app's **Home** and **Contact** pages |
+| A client creates an account in the app | `clients` table | The client can also log in to the **website's client portal** |
 
 ### Why all three must be running
 
@@ -137,7 +137,7 @@ To see these updates live, the **database**, the **website** and the **API with 
 
 - The **database** (XAMPP MySQL) is where everything is stored.
 - The **website** (XAMPP Apache) is where the admin sees new quotes and updates statuses and projects.
-- The **API** connects the app to the database. If the API is not running, the app cannot reach the database: a quote sent from the app is kept on the device and only appears on the admin page once the API is running again.
+- The **API** connects the app to the database. If the API is not running, the app cannot reach the database.
 
 After a change, **refresh the page** to see it: reload the admin page in the browser, or **pull down** on the app's dashboard or Home page.
 
@@ -179,7 +179,7 @@ Bcrypt hashes from the API use the same format as PHP's `password_hash()`, so ac
 | Measure | Detail |
 |---|---|
 | Password rules | At least 8 characters, including a letter and a number. Checked in the app for quick feedback and again in the API, where it cannot be bypassed. |
-| Login tokens | After login the API issues a token signed with HMAC-SHA256 that expires after 30 days. A client cannot change the token to see someone else's data, because the signature would no longer match. |
+| Login tokens | After login the API issues a token signed with HMAC-SHA256 that expires after 30 days. A client cannot change the token to see someone else's data, because the signature would not match. |
 | Secure storage on the device | The login token is stored in the device's **SecureStorage**, not in plain settings. |
 | Brute-force protection | A maximum of 10 login or registration attempts per minute from one address. |
 | Spam protection | A maximum of 5 quote requests per minute from one address. |
@@ -201,7 +201,7 @@ Run all three parts at the same time, in this order:
 
 1. **Start the database and the website:** open the XAMPP Control Panel and start **Apache** and **MySQL**.
 2. **Open the website's admin page:** in a browser, go to `http://localhost/<website-folder>/admin.php` and log in as the admin. Keep this tab open.
-3. **Start the API:** open `AndiswaConsultationApp.Api.sln` and press **F5**. Swagger opens at `http://localhost:5080/swagger`. Opening `http://localhost:5080/api/health` should show `"database": "connected"`.
+3. **Start the API:** open `AndiswaConsultationApp.Api.sln` and press **F5**. Swagger opens at `http://localhost:5080/swagger`. Opening `http://localhost:5080/api/health` should show a successful database response.
 4. **Start the app:** open `AndiswaConsultationApp.sln` in a second Visual Studio window, choose **Windows Machine** (recommended) or an **Android Emulator**, and press **F5**.
 
 Login credentials for admin side:
@@ -211,7 +211,7 @@ Login credentials for admin side:
 The app connects to the API automatically: `localhost` on Windows, and `10.0.2.2` on the Android emulator.
 
 ### Google sign-in
-Google sign-in needs a Client ID and Client secret from a Google Cloud project, with `http://localhost:5080/signin-google` as an authorised redirect URI. These are kept out of the repository for security and are added with **Manage User Secrets** on the API project:
+Google sign-in needs a Client ID and Client secret from a Google Cloud project, with `http://localhost:5080/signin-google` as an authorised redirect URI. These are kept out of the repository for security reasons.
 
 ```json
 {
@@ -270,7 +270,7 @@ The code is commented throughout to explain what each part does.
 ## 10. Known limitations
 
 - **Google sign-in is in testing mode.** Until the Google project is verified by Google, only Google accounts added as test users can sign in.
-- **Google sign-in on the Android emulator.** Google only accepts `localhost` or `https` addresses. Against the API running on a PC, Google sign-in therefore works in the Windows app; on Android it works once the API is deployed to Azure. Email and password login works on all platforms.
+- **Google sign-in on the Android emulator.** Google only accepts `localhost` or `https` addresses. Against the API running on a PC, Google sign-in therefore works in the Windows app; on Android it may require an emulator or trusted redirect configuration.
 - **Projects are created by the studio.** Clients can see their projects, but projects are created by the admin on the website once a quote is accepted.
 
 ---
@@ -278,7 +278,38 @@ The code is commented throughout to explain what each part does.
 
 https://youtube.com/shorts/IRTW765c3Tw?si=_pU05Dug0TdWlYnn
 
-## 12. SQL ERROR
+## 12. SQL Database Setup
+
+### Create a SQL database in Microsoft Azure
+
+To create the database used by the application, follow the Azure SQL Database setup process shown in the portal below.
+
+1. Sign in to the Microsoft Azure portal.
+2. In the search bar, type `SQL databases` and select **SQL databases**.
+3. Click **+ Create**.
+4. Choose the correct **subscription** and **resource group**.
+5. Enter a database name such as `AndiswaConsultationDB`.
+6. Select or create a server. This includes the server name, admin login, and password.
+7. Under **Compute + storage**, choose the pricing tier and capacity that matches the project requirements.
+8. Configure **Networking** based on your environment:
+   - **Public access** enabled if the app or website needs internet access.
+   - Add firewall rules for the local development machine and hosting environment.
+9. Review the **Security** settings.
+10. Under **Additional settings**, choose the database collation and default backup settings.
+11. Select **Review + create** and then **Create**.
+
+The Azure dashboard will show the newly created database once deployment finishes.
+
+### Example Azure configuration
+
+- Database name: `AndiswaConsultationDB`
+- Server: `andiswa-server` or any preferred SQL server name
+- Backup storage redundancy: `Locally redundant`
+- Networking: `Public access` / firewall configured for required IPs
+- Security: `Not enabled` unless required by your implementation
+- Additional settings: `SQL_Latin1_General_CP1_CI_AS`
+
+This configuration matches the Azure SQL creation page shown in the project documentation and supports the app's database connection requirements.
 
 ## 13. Automated Test
 
